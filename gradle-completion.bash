@@ -179,6 +179,34 @@ __gradle-short-options() {
     COMPREPLY=( $(compgen -W "$args" -- "$cur") )
 }
 
+# Instead of printing all tasks for all subprojects, print only subprojects names to limit number of entries shown on the screen
+# TODO change the way cache is stored (directory instead of single file), because we've got this information over there, but loosing due to primitve serialization. Here we recreate those informations again.
+__gradle-trim-tasks-to-subprojects() {
+    if [[ "$1" =~ ^(.+:.*) ]]; then
+        # do nothing if a subproject is already choosen
+        cat
+    else
+        awk '{
+            # Split entries into (subprojects names) AND (tasks accessible from root project)
+            if ($1 ~ /:/) {
+                # keep only subproject name (skip task name part)
+                c = split($1, arr, ":")
+                module_task[mt++] = arr[c-1] ":"
+            } else {
+                # otherwise store the whole line with description
+                root_task_line[rt++] = $0
+            }
+        } END {
+            for(i=0; i<rt; i++) {
+                print root_task_line[i]
+            }
+            for(i=0; i<mt; i++) {
+                print module_task[i]
+            }
+        }' | sort -u
+    fi
+}
+
 __gradle-tasks() {
     local cur
     _get_comp_words_by_ref -n : cur
@@ -196,10 +224,11 @@ __gradle-tasks() {
             local cached_checksum="$(cat "$cache_dir/$cache_name.md5")"
             local -a cached_tasks
             if [[ -z "$cur" ]]; then
-                cached_tasks=( $(cat "$cache_dir/$cached_checksum") )
+                cached_tasks=( $(cat "$cache_dir/$cached_checksum" | __gradle-trim-tasks-to-subprojects "$cur") )
             else
-                cached_tasks=( $(grep "^$cur" "$cache_dir/$cached_checksum") )
+                cached_tasks=( $(grep "^$cur" "$cache_dir/$cached_checksum" | __gradle-trim-tasks-to-subprojects "$cur") )
             fi
+
             COMPREPLY=( $(compgen -W "${cached_tasks[*]}" -- "$cur") )
         else
             __gradle-notify-tasks-cache-build
@@ -300,6 +329,7 @@ __gradle-generate-tasks-cache() {
     # subproject tasks can be referenced implicitly from root project
     if [[ "$GRADLE_COMPLETION_UNQUALIFIED_TASKS" == "true" ]]; then
         local -a implicit_tasks=()
+        # TODO make root_tasks or implicit_tasks (?) uniq somewhere below, to not store in cache unnecessary entries.
         implicit_tasks=( $(comm -23 <(printf "%s\n" "${subproject_tasks[@]}" | sort) <(printf "%s\n" "${root_tasks[@]}" | sort)) )
         for task in $(printf "%s\n" "${implicit_tasks[@]}"); do
             gradle_all_tasks+=( "$task" )
