@@ -192,7 +192,11 @@ __gradle-trim-tasks-to-subprojects() {
             if ($1 ~ /:/) {
                 # keep only subproject name (skip task name part)
                 c = split($1, arr, ":")
-                current = arr[c-1] ":"
+                if (c == 3) {
+                    current = ":" arr[c-1] ":"
+                } else {
+                    current = arr[c-1] ":"
+                }
                 # keep uniq names (assuming that the input to this funtion is already sorted)
                 if (mt == 0 || current != module_task[mt-1]) {
                     module_task[mt++] = current
