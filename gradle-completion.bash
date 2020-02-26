@@ -180,6 +180,7 @@ __gradle-short-options() {
 }
 
 # Instead of printing all tasks for all subprojects, print only subprojects names to limit number of entries shown on the screen
+# Once a single subproject is choosen - return its all available tasks.
 # TODO change the way cache is stored (directory instead of single file), because we've got this information over there, but loosing due to primitve serialization. Here we recreate those informations again.
 __gradle-trim-tasks-to-subprojects() {
     if [[ "$1" =~ ^(.+:.*) ]]; then
@@ -191,7 +192,12 @@ __gradle-trim-tasks-to-subprojects() {
             if ($1 ~ /:/) {
                 # keep only subproject name (skip task name part)
                 c = split($1, arr, ":")
-                module_task[mt++] = arr[c-1] ":"
+                current = arr[c-1] ":"
+                # keep uniq names (assuming that the input to this funtion is already sorted)
+                if (mt == 0 || current != module_task[mt-1]) {
+                    module_task[mt++] = current
+                }
+                module_task_line[mtl++] = $0
             } else {
                 # otherwise store the whole line with description
                 root_task_line[rt++] = $0
@@ -200,10 +206,17 @@ __gradle-trim-tasks-to-subprojects() {
             for(i=0; i<rt; i++) {
                 print root_task_line[i]
             }
-            for(i=0; i<mt; i++) {
-                print module_task[i]
+            if (mt > 1) {
+                for(i=0; i<mt; i++) {
+                    print module_task[i]
+                }
+            } else {
+                # at most 1 subproject is choosen, show possible tasks
+                for(i=0; i<mtl; i++) {
+                    print module_task_line[i]
+                }
             }
-        }' | sort -u
+        }'
     fi
 }
 
