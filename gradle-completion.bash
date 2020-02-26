@@ -181,7 +181,6 @@ __gradle-short-options() {
 
 # Instead of printing all tasks for all subprojects, print only subprojects names to limit number of entries shown on the screen
 # Once a single subproject is choosen - return its all available tasks.
-# TODO change the way cache is stored (directory instead of single file), because we've got this information over there, but loosing due to primitve serialization. Here we recreate those informations again.
 __gradle-trim-tasks-to-subprojects() {
     if [[ "$1" =~ ^(.+:.*) ]]; then
         # do nothing if a subproject is already choosen
