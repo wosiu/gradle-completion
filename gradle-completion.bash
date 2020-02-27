@@ -196,22 +196,22 @@ __gradle-trim-tasks-to-subprojects() {
                 } else {
                     current = arr[c-1] ":"
                 }
-                # keep uniq names (assuming that the input to this funtion is already sorted)
-                if (mt == 0 || current != module_task[mt-1]) {
-                    module_task[mt++] = current
+                # keep uniq names (it assumes that the input to this funtion is already sorted)
+                if (m == 0 || current != module[m-1]) {
+                    module[m++] = current
                 }
                 module_task_line[mtl++] = $0
             } else {
                 # otherwise store the whole line with description
-                root_task_line[rt++] = $0
+                root_task_line[rtl++] = $0
             }
         } END {
-            for(i=0; i<rt; i++) {
+            for(i=0; i<rtl; i++) {
                 print root_task_line[i]
             }
-            if (mt > 1) {
-                for(i=0; i<mt; i++) {
-                    print module_task[i]
+            if (m > 1) {
+                for(i=0; i<m; i++) {
+                    print module[i]
                 }
             } else {
                 # at most 1 subproject is choosen, show possible tasks
