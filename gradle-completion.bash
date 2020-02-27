@@ -240,7 +240,7 @@ __gradle-tasks() {
             local cached_checksum="$(cat "$cache_dir/$cache_name.md5")"
             local -a cached_tasks
             if [[ -z "$cur" ]]; then
-                cached_tasks=( $(cat "$cache_dir/$cached_checksum" | __gradle-trim-tasks-to-subprojects "$cur") )
+                cached_tasks=( $(grep -v "^:" "$cache_dir/$cached_checksum" | __gradle-trim-tasks-to-subprojects "$cur") )
             else
                 cached_tasks=( $(grep "^$cur" "$cache_dir/$cached_checksum" | __gradle-trim-tasks-to-subprojects "$cur") )
             fi
