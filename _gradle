@@ -314,7 +314,7 @@ _gradle_dependency_configurations() {
 }
 
 __gradle-source-project-overrides() {
-    if [[ -f "$project_root_dir/.gradle-completion/gradle-completion.bash" ]]; then
+    if [[ -f "$project_root_dir/.gradle-completion/_gradle" ]]; then
         # override default behaviours of this script
         source "$project_root_dir"/.gradle-completion/_gradle
     fi
