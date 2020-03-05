@@ -128,6 +128,13 @@ __gradle-generate-tasks-cache() {
     echo $gradle_files_checksum >| $cache_dir/$cache_name.md5
 }
 
+__gradle-source-project-overrides() {
+    if [[ -f "$project_root_dir/.gradle-completion/_gradle" ]]; then
+        # override default behaviours of this script
+        source "$project_root_dir"/.gradle-completion/_gradle
+    fi
+}
+
 __gradle-completion-init() {
     local cache_dir cache_name gradle_build_file gradle_files_checksum project_root_dir
 
@@ -145,7 +152,7 @@ __gradle-completion-init() {
 }
 
 __gradle_tasks() {
-    local cache_dir cache_name gradle_build_file gradle_files_checksum project_root_dir
+    local cache_dir cache_name gradle_build_file gradle_files_checksum
 
     __gradle-init-cache-dir
     __gradle-set-build-file
@@ -321,6 +328,7 @@ __gradle-source-project-overrides() {
 }
 
 _gradle() {
+    local project_root_dir
     local cur=${words[CURRENT]}
     local curcontext="$curcontext" state
     integer ret=1
