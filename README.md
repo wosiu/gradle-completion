@@ -1,3 +1,12 @@
+# Unofficial Edit
+Changed the original gradle-completion with:
+- [PR#89](https://github.com/gradle/gradle-completion/pull/89) Allow to override default completion cache initialization - we use internally custom task for that `initCompletionCache`
+- [PR#87](https://github.com/gradle/gradle-completion/pull/87) Halve results - skip completions starting with ':' if nothing is typed
+- [PR#86](https://github.com/gradle/gradle-completion/pull/86) Limit number of results - show only subprojects name instead of all available commands for all subprojects until a whole project name is already typed.
+
+Only manuall installation work for this repository. Watch out, because the description of installation below is original and describes also installation via brew, which does not contain changes from this repository.
+
+
 # gradle-completion
 Bash and Zsh completion support for [Gradle](https://gradle.org).
 
